@@ -9,4 +9,9 @@ class User < ApplicationRecord
   def jwt_payload
     super
   end
+
+  # Associations
+  has_many :transactions
+  has_many :incomes
+  has_many :budgets
 end
