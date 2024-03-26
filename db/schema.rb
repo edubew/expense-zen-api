@@ -10,9 +10,51 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_23_193035) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_25_115402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "budgets", force: :cascade do |t|
+    t.bigint "users_id"
+    t.bigint "category_id"
+    t.decimal "amount"
+    t.date "start_date"
+    t.date "end_date"
+    t.string "period"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_budgets_on_category_id"
+    t.index ["users_id"], name: "index_budgets_on_users_id"
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.string "icon"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "incomes", force: :cascade do |t|
+    t.bigint "user_id"
+    t.decimal "amount"
+    t.date "date"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_incomes_on_user_id"
+  end
+
+  create_table "transactions", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "category_id"
+    t.decimal "amount"
+    t.date "date"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_transactions_on_category_id"
+    t.index ["user_id"], name: "index_transactions_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -28,4 +70,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_23_193035) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "budgets", "categories"
+  add_foreign_key "budgets", "users", column: "users_id"
+  add_foreign_key "incomes", "users"
+  add_foreign_key "transactions", "categories"
+  add_foreign_key "transactions", "users"
 end
