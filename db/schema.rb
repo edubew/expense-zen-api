@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_27_112458) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_27_120716) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -23,14 +23,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_27_112458) do
 
   create_table "goals", force: :cascade do |t|
     t.bigint "user_id"
-    t.bigint "category_id"
     t.decimal "amount"
     t.date "start_date"
     t.date "end_date"
     t.string "period"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["category_id"], name: "index_goals_on_category_id"
+    t.string "name"
+    t.string "status"
     t.index ["user_id"], name: "index_goals_on_user_id"
   end
 
@@ -72,7 +72,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_27_112458) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
-  add_foreign_key "goals", "categories"
   add_foreign_key "goals", "users"
   add_foreign_key "incomes", "users"
   add_foreign_key "transactions", "categories"
