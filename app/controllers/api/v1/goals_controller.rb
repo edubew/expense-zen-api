@@ -2,7 +2,7 @@ class Api::V1::GoalsController < ApplicationController
   before_action :authenticate_user
   before_action :set_goal, only: [:update, :destroy, :show]
 
-  # Create a new financial goal
+  # Create a new financial goal(POST)
   def create
     goal = current_user.goals.new(goal_params)
     if goal.save
@@ -12,7 +12,7 @@ class Api::V1::GoalsController < ApplicationController
     end
   end
 
-  # Update an existing goal
+  # Update an existing goal(PUT)
   def update
     if @goal.update(goal_params)
       render json: { message: 'Goal updated successfully🎉' }, status: :ok
@@ -21,7 +21,7 @@ class Api::V1::GoalsController < ApplicationController
     end
   end
 
-  # Delete a goal
+  # Delete a goal(DELETE)
   def destroy
     if @goal.destroy
       render json: { message: 'Goal deleted successfully' }, status: :ok
@@ -35,7 +35,7 @@ class Api::V1::GoalsController < ApplicationController
     render json: @goal, include: [:transactions], status: :ok
   end
 
-  # List all user's goals
+  # List all user's goals(GET)
   def index
     goals = current_user.goals
     render json: goals, status: :ok
