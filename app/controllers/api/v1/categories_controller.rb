@@ -4,7 +4,7 @@ class Api::V1::CategoriesController < ApplicationController
 
   # Create a category(POST)
   def create
-    category = Category.new(category_params)
+    category = current_user.categories.new(category_params)
     if category.save
       render json: { message: 'Category created🎉' }, status: :created
     else
@@ -14,7 +14,7 @@ class Api::V1::CategoriesController < ApplicationController
 
   # List all categories(GET)
   def index
-    categories = Category.all
+    categories = current_user.categories
     render json: categories, status: :ok
   end
 
@@ -43,6 +43,6 @@ class Api::V1::CategoriesController < ApplicationController
   end
 
   def set_category
-    @category = Category.find(params[:id])
+    @category = current_user.categories.find(params[:id])
   end
 end
