@@ -1,5 +1,5 @@
 class Api::V1::CategoriesController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_category, only: [:update, :destroy]
 
   # Create a category(POST)
@@ -43,6 +43,7 @@ class Api::V1::CategoriesController < ApplicationController
   end
 
   def set_category
-    @category = current_user.categories.find(params[:id])
+    @category = current_user.categories.find_by(id: params[:id])
+    render json: { message: 'Category not found' }, status: :unprocessable_entity unless @category
   end
 end
