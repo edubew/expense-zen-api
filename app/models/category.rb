@@ -1,5 +1,6 @@
 class Category < ApplicationRecord
   # Associations
+  belongs_to :user
   has_many :transactions, dependent: :destroy
 
   # Validations

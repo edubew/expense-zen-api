@@ -14,4 +14,5 @@ class User < ApplicationRecord
   has_many :transactions
   has_many :incomes
   has_many :budgets
+  has_many :categories, dependent: :destroy
 end
