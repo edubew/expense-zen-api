@@ -6,8 +6,6 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
   let(:valid_attributes) { { name: 'Test Category', icon: 'test-icon' } }
   let(:invalid_attributes) { { name: '', icon: '' } }
   let!(:category) { FactoryBot.create(:category, user: user) }
-
-  let(:user) { FactoryBot.create(:user) }
   
   before do
     sign_in user

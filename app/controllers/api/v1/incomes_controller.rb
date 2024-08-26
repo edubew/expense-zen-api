@@ -1,5 +1,5 @@
 class Api::V1::IncomesController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_income, only: [:update, :destroy]
 
   # Create a new income entry(POST)
@@ -43,6 +43,7 @@ class Api::V1::IncomesController < ApplicationController
   end
 
   def set_income
-    @income = current_user.incomes.find(params[:id])
+    @income = current_user.incomes.find_by(id: params[:id])
+    render json: { message: 'Income Entry not found' }, status: :unprocessable_entity unless @income
   end
 end
