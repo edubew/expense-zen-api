@@ -1,6 +1,6 @@
 class Api::V1::GoalsController < ApplicationController
   before_action :authenticate_user
-  before_action :set_goal, only: [:update, :destroy, :show]
+  before_action :set_goal, only: %i[update destroy show]
 
   # Create a new financial goal(POST)
   def create

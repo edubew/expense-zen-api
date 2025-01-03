@@ -1,7 +1,7 @@
 class Api::V1::TransactionsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_category
-  before_action :set_transaction, only: [:update, :destroy]
+  before_action :set_transaction, only: %i[update destroy]
 
   # Create a new transaction(POST)
   def create
@@ -10,7 +10,7 @@ class Api::V1::TransactionsController < ApplicationController
     if transaction.save
       render json: { message: 'Transaction created successfully🎉' }, status: :created
     else
-       Rails.logger.error("Failed to save transaction: #{transaction.errors.full_messages}")
+      Rails.logger.error("Failed to save transaction: #{transaction.errors.full_messages}")
       render json: { error: 'Unable to create the transaction' }, status: :unprocessable_entity
     end
   end

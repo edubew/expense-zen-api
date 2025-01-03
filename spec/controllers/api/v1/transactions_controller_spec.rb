@@ -23,9 +23,9 @@ RSpec.describe Api::V1::TransactionsController, type: :controller do
   describe 'POST #create' do
     context 'with valid attributes' do
       it 'creates a new transaction' do
-        expect {
+        expect do
           post :create, params: { category_id: category.id, transaction: valid_attributes }
-        }.to change(Transaction, :count).by(1)
+        end.to change(Transaction, :count).by(1)
         expect(response).to have_http_status(:created)
         expect(JSON.parse(response.body)['message']).to eq('Transaction created successfully🎉')
       end
@@ -33,20 +33,20 @@ RSpec.describe Api::V1::TransactionsController, type: :controller do
 
     context 'with invalid parameters' do
       it 'does not create a new transaction entry' do
-        expect {
+        expect do
           post :create, params: { category_id: category.id, transaction: invalid_attributes }
-      }.not_to change(Transaction, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
-      expect(JSON.parse(response.body)['error']).to eq('Unable to create the transaction')
+        end.not_to change(Transaction, :count)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Unable to create the transaction')
       end
     end
   end
 
   describe 'PUT #update' do
     context 'with valid attributes' do
-      let(:new_attributes) {{ amount: 1000.0 }}
+      let(:new_attributes) { { amount: 1000.0 } }
       it 'updates the requested transaction entry' do
-        put :update, params: {id: transaction.id, category_id: category.id, transaction: new_attributes }
+        put :update, params: { id: transaction.id, category_id: category.id, transaction: new_attributes }
         transaction.reload
         expect(transaction.amount).to eq(1000.0)
         expect(response).to have_http_status(:ok)
@@ -60,7 +60,7 @@ RSpec.describe Api::V1::TransactionsController, type: :controller do
         errors = JSON.parse(response.body)['error']
         expected_errors = [
           "Amount can't be blank",
-          "Amount is not a number",
+          'Amount is not a number',
           "Item name can't be blank",
           "Date can't be blank"
         ]
@@ -71,9 +71,9 @@ RSpec.describe Api::V1::TransactionsController, type: :controller do
 
   describe 'DELETE #destroy' do
     it 'destroy the requested transaction entry' do
-      expect {
+      expect do
         delete :destroy, params: { id: transaction.id, category_id: category.id }
-      }.to change(Transaction, :count).by(-1)
+      end.to change(Transaction, :count).by(-1)
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['message']).to eq('Transaction deleted successfully🎉')
     end

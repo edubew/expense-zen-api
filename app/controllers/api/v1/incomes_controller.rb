@@ -1,6 +1,6 @@
 class Api::V1::IncomesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_income, only: [:update, :destroy]
+  before_action :set_income, only: %i[update destroy]
 
   # Create a new income entry(POST)
   def create

@@ -6,7 +6,7 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
   let(:valid_attributes) { { name: 'Test Category', icon: 'test-icon' } }
   let(:invalid_attributes) { { name: '', icon: '' } }
   let!(:category) { FactoryBot.create(:category, user: user) }
-  
+
   before do
     sign_in user
   end
@@ -22,9 +22,9 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
   describe 'POST #create' do
     context 'with valid parameters' do
       it 'creates a new category' do
-        expect {
+        expect do
           post :create, params: { category: valid_attributes }
-        }.to change(Category, :count).by(1)
+        end.to change(Category, :count).by(1)
         expect(response).to have_http_status(:created)
         expect(JSON.parse(response.body)['message']).to eq('Category created🎉')
       end
@@ -32,9 +32,9 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
 
     context 'with invalid parameters' do
       it 'does not create a new category' do
-        expect {
+        expect do
           post :create, params: { category: invalid_attributes }
-        }.not_to change(Category, :count)
+        end.not_to change(Category, :count)
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)['error']).to eq('Unable to create category😞')
       end
@@ -64,17 +64,17 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
 
   describe 'DELETE #destroy' do
     it 'destroys the requested category' do
-      expect {
+      expect do
         delete :destroy, params: { id: category.id }
-      }.to change(Category, :count).by(-1)
+      end.to change(Category, :count).by(-1)
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)['message']).to eq('Category removed successfully👌')
     end
 
     it 'does not destroy a non-existent category' do
-      expect {
+      expect do
         delete :destroy, params: { id: -1 }
-      }.not_to change(Category, :count)
+      end.not_to change(Category, :count)
       expect(response).to have_http_status(:unprocessable_entity)
     end
   end
