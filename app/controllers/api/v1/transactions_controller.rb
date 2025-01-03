@@ -1,14 +1,16 @@
 class Api::V1::TransactionsController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_category
-  before_action :set_transaction, only: [:show, :update, :destroy]
+  before_action :set_transaction, only: [:update, :destroy]
 
-  # Create a new transaaction(POST)
+  # Create a new transaction(POST)
   def create
     transaction = @category.transactions.new(transaction_params)
-    if transaaction.save
+    transaction.user = current_user
+    if transaction.save
       render json: { message: 'Transaction created successfully🎉' }, status: :created
     else
+       Rails.logger.error("Failed to save transaction: #{transaction.errors.full_messages}")
       render json: { error: 'Unable to create the transaction' }, status: :unprocessable_entity
     end
   end
@@ -17,11 +19,6 @@ class Api::V1::TransactionsController < ApplicationController
   def index
     transactions = @category.transactions.order(created_at: :desc)
     render json: transactions, status: :ok
-  end
-
-  # Show details of a specific transaction
-  def show
-    render json: @transaction, status: :ok
   end
 
   # Edit an existing transaction(PUT)
@@ -47,7 +44,7 @@ class Api::V1::TransactionsController < ApplicationController
 
 
   def transaction_params
-    params.require(:transaction).permit(:amount, :date, :description)
+    params.require(:transaction).permit(:amount, :date, :item_name)
   end
 
   def set_category
