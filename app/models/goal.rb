@@ -6,20 +6,23 @@ class Goal < ApplicationRecord
   # Validations
   validates :name, presence: true
   validates :status, presence: true
-  validates :period, presence: true
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :start_date, presence: true
   validates :end_date, presence: true
 
-  # Calculate the difference between target and progress
-  def progress_difference
-    (progress || 0) - amount
-  end
+  before_save :set_status
 
   private
 
-  def progress_within_limit
-    errors.add(:progress, "cannot exceed goal anount") if progress && progress > amount
+  # Dynamically set the status based on progress and amount
+  def set_status
+    if progress >=amount
+      self.status = 'Completed'
+    elsif Date.today > end_date
+      self.status = 'Failed'
+    else
+      self.status = 'Active'
+    end
   end
 
   # Custom validation to ensure the end date doesn't come before the start date

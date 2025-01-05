@@ -34,8 +34,8 @@ class Api::V1::GoalsController < ApplicationController
   def show
     render json: {
       goal: @goal,
-      progress_difference: @goal.progress_difference,
-      status: status_message(@goal.progress_difference)
+      progress_difference: (@goal.progress - @goal.amount),
+      status: generate_status_message
     }, include: [:transactions], status: :ok
     # render json: @goal, include: [:transactions], status: :ok
   end
@@ -51,14 +51,18 @@ class Api::V1::GoalsController < ApplicationController
     render json: goals, status: :ok
   end
 
-  # Add to a goal to a goal(PATCH)
+  # Add funds towards a goal(PATCH)
   def deposit
-    if params[:amount].to_f.positive?
-      @goal.progress || = 0
-      @goal.progress += params[:amount].to_f
-
+    deposit_amount = params[:amount].to_f
+    if deposit_amount.positive?
+      @goal.progress += deposit_amount
       if goal.save
-        render json: {message 'Deposit added sucessfully🎉', progress: @goal.progress }, status: :ok
+        render json: {
+          message 'Deposit added sucessfully🎉',
+          goal: @goal,
+          progress_difference: (@goal.progress - @goal.amount),
+          status_message: generate_status_message
+        }, status: :ok
       else
         render json: {error: @goal.errors.full_messaes }, status: :unprocessable entity
       end
@@ -75,20 +79,20 @@ class Api::V1::GoalsController < ApplicationController
   private
 
   def goal_params
-    params.require(:goal).permit(:amount, :name, :status, :period, :start_date, :end_date)
+    params.require(:goal).permit(:amount, :name, :start_date, :end_date)
   end
 
   def set_goal
     @goal = current_user.goals.find(params[:id])
   end
 
-  def status_message(difference)
-    if difference.negative?
-      "Goal is #{difference.abs} away from target."
-    elsif difference.positive?
-      "Goal surpassed by #{difference}!"
+  def generate_status_message
+    case @goal.status
+    when 'completed'
+      "Congratulations! You have completed your goal.🎉"
+    when 'failed'
+      "Unfortunately, the goal period has ended, and the target was not achieved."
     else
-      "Goal achieved exactly"
-    end
+      "You are actively working on this goal. Keep it up!🚀"
   end
 end
