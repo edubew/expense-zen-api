@@ -11,6 +11,17 @@ class Goal < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  # Calculate the difference between target and progress
+  def progress_difference
+    (progress || 0) - amount
+  end
+
+  private
+
+  def progress_within_limit
+    errors.add(:progress, "cannot exceed goal anount") if progress && progress > amount
+  end
+
   # Custom validation to ensure the end date doesn't come before the start date
   validate :end_date_cannot_be_before_start_date
 
