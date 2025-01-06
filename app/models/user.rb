@@ -9,6 +9,7 @@ class User < ApplicationRecord
   # Associations
   has_many :transactions
   has_many :incomes
+  has_many :goals
   has_many :budgets
   has_many :categories, dependent: :destroy
 end
