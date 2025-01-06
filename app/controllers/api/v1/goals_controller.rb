@@ -1,5 +1,5 @@
 class Api::V1::GoalsController < ApplicationController
-  before_action :authenticate_user
+  before_action :authenticate_user!
   before_action :set_goal, only: %i[update destroy show deposit]
 
   # Create a new financial goal(POST)
@@ -35,7 +35,7 @@ class Api::V1::GoalsController < ApplicationController
     render json: {
       goal: @goal,
       progress_difference: (@goal.progress - @goal.amount),
-      status: generate_status_message
+      status_message: generate_status_message(@goal)
     }, include: [:transactions], status: :ok
     # render json: @goal, include: [:transactions], status: :ok
   end
@@ -53,21 +53,26 @@ class Api::V1::GoalsController < ApplicationController
 
   # Add funds towards a goal(PATCH)
   def deposit
-    deposit_amount = params[:amount].to_f
-    if deposit_amount.positive?
-      @goal.progress += deposit_amount
+    goal = current_user.goals.find_by(id: params[:id])
+    if goal
+      deposit_amount = params[:amount].to_f
+
+      return reander json: { error: 'Amount must be positive.' }, status: :unprocessable_entity if deposit_amount <= 0
+
+      goal.progress += deposit_amount # increment the progress
+
       if goal.save
         render json: {
-          message 'Deposit added sucessfully🎉',
-          goal: @goal,
-          progress_difference: (@goal.progress - @goal.amount),
-          status_message: generate_status_message
+          message: 'Deposit added sucessfully🎉',
+          goal: goal,
+          progress_difference: (goal.progress - goal.amount),
+          status_message: generate_status_message(goal)
         }, status: :ok
       else
-        render json: {error: @goal.errors.full_messaes }, status: :unprocessable entity
+        render json: { error: goal.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: {error: 'Amount must be positive'}, status: :unprocessable_entity
+      render json: { error: 'Goal not found.' }, status: :not_found
     end
   end
 
@@ -86,13 +91,14 @@ class Api::V1::GoalsController < ApplicationController
     @goal = current_user.goals.find(params[:id])
   end
 
-  def generate_status_message
-    case @goal.status
+  def generate_status_message(goal)
+    case goal.status
     when 'completed'
-      "Congratulations! You have completed your goal.🎉"
+      'Congratulations! You have completed your goal.🎉'
     when 'failed'
-      "Unfortunately, the goal period has ended, and the target was not achieved."
+      'Unfortunately, the goal period has ended, and the target was not achieved.'
     else
-      "You are actively working on this goal. Keep it up!🚀"
+      'You are actively working on this goal. Keep it up!🚀'
+    end
   end
 end

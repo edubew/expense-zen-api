@@ -5,7 +5,7 @@ class Goal < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :status, presence: true
+  # validates :status, presence: true
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :start_date, presence: true
   validates :end_date, presence: true
@@ -16,13 +16,13 @@ class Goal < ApplicationRecord
 
   # Dynamically set the status based on progress and amount
   def set_status
-    if progress >=amount
-      self.status = 'Completed'
-    elsif Date.today > end_date
-      self.status = 'Failed'
-    else
-      self.status = 'Active'
-    end
+    self.status = if progress >= amount
+                    'Completed'
+                  elsif Date.today > end_date
+                    'Failed'
+                  else
+                    'Active'
+                  end
   end
 
   # Custom validation to ensure the end date doesn't come before the start date
