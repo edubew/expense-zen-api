@@ -10,7 +10,13 @@ gem 'rack-cors'
 gem 'devise'
 gem 'devise-jwt'
 
+# Linters
 gem 'rubocop', '>= 1.0', '< 2.0'
+
+# API documentation with Swagger
+gem 'rswag-api'
+gem 'rswag-ui'
+gem 'rswag-specs'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
