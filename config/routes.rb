@@ -8,13 +8,17 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :categories, only: [:create, :index, :update, :destroy]
+      resources :categories, only: [:create, :index, :update, :destroy] do
+        resources :transactions, only: [:index, :create]
+      end
+
       resources :transactions, only: [:create, :index, :update, :destroy]
       resources :incomes, only: [:create, :index, :update, :destroy]
-      resources :goals, only: [:create, :index, :show, :update, :destroy]
 
-      resources :categories do
-        resources :transactions, only: [:index, :create]
+      resources :goals, only: [:create, :index, :show, :update, :destroy] do
+        member do
+          patch :deposit
+        end
       end
     end
   end
