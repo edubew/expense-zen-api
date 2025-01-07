@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 require 'rswag/specs'
 require 'rails_helper'
 
