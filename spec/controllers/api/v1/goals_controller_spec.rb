@@ -3,9 +3,11 @@ require 'rails_helper'
 RSpec.describe Api::V1::GoalsController, type: :controller do
   include Devise::Test::ControllerHelpers
   let(:user) { create(:user) }
-  let(:goal) do
-    create(:goal, user: user, amount: 1500.0, progress: 1000.0, start_date: Date.today, end_date: Date.today + 90.days)
+  let!(:goals) do
+    create_list(:goal, 3, user: user, amount: 1500.0, progress: 1000.0, start_date: Date.today, end_date: Date.today + 90.days)
   end
+  
+  let(:goal) { goals.first }
 
   before do
     sign_in user
@@ -18,6 +20,16 @@ RSpec.describe Api::V1::GoalsController, type: :controller do
                              end_date: Date.today + 120.days } }
       expect(response).to have_http_status(:created)
       expect(JSON.parse(response.body)['message']).to eq('Goal created successfully🎉')
+    end
+  end
+
+   describe 'GET #index' do
+    it 'lists all goals for the current user' do
+      get :index
+      expect(response).to have_http_status(:ok)
+      response_body = JSON.parse(response.body)
+      expect(response_body.size).to eq(3)
+      expect(response_body.first).to include('progress_difference', 'status')
     end
   end
 

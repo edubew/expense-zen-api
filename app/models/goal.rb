@@ -10,6 +10,10 @@ class Goal < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  def progress_difference
+    amount - progress
+  end
+
   before_save :set_status
 
   private

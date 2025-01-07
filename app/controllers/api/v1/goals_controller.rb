@@ -45,7 +45,7 @@ class Api::V1::GoalsController < ApplicationController
     goals = current_user.goals.map do |goal|
       goal.as_json.merge(
         progress_difference: goal.progress_difference,
-        status: status_message(goal.progress_difference)
+        status_message: generate_status_message(goal)
       )
     end
     render json: goals, status: :ok
