@@ -5,13 +5,12 @@ class Goal < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  # validates :status, presence: true
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :start_date, presence: true
   validates :end_date, presence: true
 
-  def progress_difference
-    amount - progress
+ def progress_difference
+    (amount || 0).to_f - (progress || 0).to_f
   end
 
   before_save :set_status
