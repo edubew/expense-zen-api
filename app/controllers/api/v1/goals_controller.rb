@@ -43,8 +43,9 @@ class Api::V1::GoalsController < ApplicationController
   # List all user's goals(GET)
   def index
     goals = current_user.goals.map do |goal|
+      puts "Goal Progress: #{goal.progress}, Amount: #{goal.amount}"
       goal.as_json.merge(
-        progress_difference: goal.progress_difference,
+        progress_difference: goal.progress_difference.to_f,
         status_message: generate_status_message(goal)
       )
     end
