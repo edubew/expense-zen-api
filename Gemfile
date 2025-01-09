@@ -14,9 +14,11 @@ gem 'devise-jwt'
 gem 'rubocop', '>= 1.0', '< 2.0'
 
 # API documentation with Swagger
-gem 'rswag-api'
 gem 'rswag-specs'
+gem 'rswag-api'
 gem 'rswag-ui'
+
+gem 'active_model_serializers', '~> 0.10.0'
 
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
@@ -59,6 +61,12 @@ end
 
 # group :test do
 #   gem 'rspec-rails'
+# end
+
+# group :test do
+#   gem 'rswag-specs'
+#   gem 'rswag-api'
+#   gem 'rswag-ui'
 # end
 
 group :development do
