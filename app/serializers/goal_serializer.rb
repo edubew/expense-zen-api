@@ -8,4 +8,8 @@ class GoalSerializer < ActiveModel::Serializer
   def progress
     object.progress.to_f
   end
+
+  def progress_difference
+    object.progress_difference.to_f
+  end
 end

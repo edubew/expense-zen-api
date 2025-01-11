@@ -2,6 +2,7 @@ require 'swagger_helper'
 require 'rails_helper'
 
 RSpec.describe 'Goals API', type: :request do
+  include Devise::Test::IntegrationHelpers
 let(:user) { create(:user) }
 let!(:goals) do
   create_list(:goal, 3, user: user, amount: 1500.0, progress: 1000.0, start_date: Date.today,
@@ -40,6 +41,8 @@ path '/api/v1/goals/' do
         expect(data.size).to eq(3)
         expect(data.first['progress_difference']).to eq(data.first['amount'] - data.first['progress'])
         expect(data.first['status_message']).to be_present
+        puts JSON.pretty_generate(JSON.parse(response.body))
+
       end
     end
 

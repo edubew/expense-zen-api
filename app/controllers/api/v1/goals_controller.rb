@@ -34,7 +34,7 @@ class Api::V1::GoalsController < ApplicationController
   def show
     render json: {
       goal: @goal,
-      progress_difference: (@goal.progress - @goal.amount),
+      progress_difference: (@goal.amount - @goal.progress),
       status_message: generate_status_message(@goal)
     }, include: [:transactions], status: :ok
     # render json: @goal, include: [:transactions], status: :ok
@@ -58,7 +58,7 @@ class Api::V1::GoalsController < ApplicationController
     if goal
       deposit_amount = params[:amount].to_f
 
-      return reander json: { error: 'Amount must be positive.' }, status: :unprocessable_entity if deposit_amount <= 0
+      return render json: { error: 'Amount must be positive.' }, status: :unprocessable_entity if deposit_amount <= 0
 
       goal.progress += deposit_amount # increment the progress
 
