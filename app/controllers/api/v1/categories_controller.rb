@@ -8,7 +8,7 @@ class Api::V1::CategoriesController < ApplicationController
     if category.save
       render json: { message: 'Category created🎉' }, status: :created
     else
-      render json: { error: 'Unable to create category😞' }, status: :unprocessable_entity
+      render json: { errors: category.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -21,7 +21,7 @@ class Api::V1::CategoriesController < ApplicationController
   # Edit a category(PUT)
   def update
     if @category.update(category_params)
-      render json: @category, status: :ok
+      render json: { message: 'Category updated successfully👌', category: @category }, status: :ok
     else
       render json: { error: 'Could not update category😞Try again' }, status: :unprocessable_entity
     end

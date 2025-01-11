@@ -1,7 +1,7 @@
+require 'swagger_helper'
 require 'rails_helper'
 
-RSpec.describe Api::V1::CategoriesController, type: :controller do
-  include Devise::Test::ControllerHelpers
+RSpec.describe 'Categories API', type: :request do
   let(:user) { FactoryBot.create(:user) }
   let(:valid_attributes) { { name: 'Test Category', icon: 'test-icon' } }
   let(:invalid_attributes) { { name: '', icon: '' } }
@@ -11,71 +11,105 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
     sign_in user
   end
 
-  describe 'GET #index' do
-    it 'returns a list of categories' do
-      get :index
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)).to be_an_instance_of(Array)
-    end
-  end
+  path '/api/v1/categories' do
+    get 'Retrieve all categories' do
+      tags 'Categories'
+      produces 'application/json'
+      security [bearer_auth: []]
 
-  describe 'POST #create' do
-    context 'with valid parameters' do
-      it 'creates a new category' do
-        expect do
-          post :create, params: { category: valid_attributes }
-        end.to change(Category, :count).by(1)
-        expect(response).to have_http_status(:created)
-        expect(JSON.parse(response.body)['message']).to eq('Category created🎉')
+      response '200', 'categories retrieved' do
+        run_test! do |response|
+          expect(response).to have_http_status(:ok)
+          expect(JSON.parse(response.body)).to be_an_instance_of(Array)
+        end
       end
     end
 
-    context 'with invalid parameters' do
-      it 'does not create a new category' do
-        expect do
-          post :create, params: { category: invalid_attributes }
-        end.not_to change(Category, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Unable to create category😞')
+    post 'Create a new category' do
+      tags 'Categories'
+      consumes 'application/json'
+      security [bearer_auth: []]
+      parameter name: :category, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string },
+          icon: { type: :string }
+        },
+        required: %w[name icon]
+      }
+
+      response '201', 'category created' do
+        let(:params) { { category: valid_attributes } }
+        run_test! do |response|
+          expect(response).to have_http_status(:created)
+          expect(JSON.parse(response.body)['message']).to eq('Category created🎉')
+        end
       end
-    end
-  end
 
-  describe 'PUT #update' do
-    context 'with valid parameters' do
-      let(:new_attributes) { { name: 'Updated Category' } }
-
-      it 'updates the requested category' do
-        put :update, params: { id: category.id, category: new_attributes }
-        category.reload
-        expect(category.name).to eq('Updated Category')
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'with invalid parameters' do
-      it 'does not update the category' do
-        put :update, params: { id: category.id, category: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(JSON.parse(response.body)['error']).to eq('Could not update category😞Try again')
+      response '422', 'invalid parameters' do
+        let(:params) { { category: invalid_attributes } }
+        run_test! do |response|
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(JSON.parse(response.body)['errors']).to include("Name can't be blank", "Icon can't be blank")
+        end
       end
     end
   end
 
-  describe 'DELETE #destroy' do
-    it 'destroys the requested category' do
-      expect do
-        delete :destroy, params: { id: category.id }
-      end.to change(Category, :count).by(-1)
-      expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)['message']).to eq('Category removed successfully👌')
+  path '/api/v1/categories/{id}' do
+    put 'Update a category' do
+      tags 'Categories'
+      consumes 'application/json'
+      security [bearer_auth: []]
+      parameter name: :id, in: :path, type: :integer, description: 'Category ID'
+      parameter name: :category, in: :body, schema: {
+        type: :object,
+        properties: {
+          name: { type: :string },
+          icon: { type: :string }
+        },
+        required: %w[name icon]
+      }
+
+      response '200', 'category updated' do
+        let(:id) { category.id }
+        let(:params) { { category: { name: 'Updated Category', icon: 'updated-icon' } } }
+        run_test! do |response|
+          expect(response).to have_http_status(:ok)
+          category.reload
+          expect(category.name).to eq('Updated Category')
+        end
+      end
+
+      response '422', 'invalid parameters' do
+        let(:id) { category.id }
+        let(:params) { { category: invalid_attributes } }
+        run_test! do |response|
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(JSON.parse(response.body)['error']).to eq('Could not update category😞 Try again')
+        end
+      end
     end
 
-    it 'does not destroy a non-existent category' do
-      expect do
-        delete :destroy, params: { id: -1 }
-      end.not_to change(Category, :count)
-      expect(response).to have_http_status(:unprocessable_entity)
+    delete 'Delete a category' do
+      tags 'Categories'
+      security [bearer_auth: []]
+      parameter name: :id, in: :path, type: :integer, description: 'Category ID'
+
+      response '200', 'category deleted' do
+        let(:id) { category.id }
+        run_test! do |response|
+          expect(response).to have_http_status(:ok)
+          expect(JSON.parse(response.body)['message']).to eq('Category removed successfully👌')
+        end
+      end
+
+      response '422', 'invalid request' do
+        let(:id) { -1 }
+        run_test! do |response|
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
   end
 end
